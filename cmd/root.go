@@ -5,6 +5,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -19,20 +22,25 @@ var (
 	rootCmd = &cobra.Command{
 		Use:     basename,
 		Short:   "Fetch secrets from cloud secret managers.",
+		Long:    "Fetch secrets from cloud secret managers.",
 		Args:    cobra.NoArgs,
 		Version: version,
+		CompletionOptions: cobra.CompletionOptions{
+			HiddenDefaultCmd: true,
+		},
 	}
 )
 
-// panicIfError - Panic if an error occurred.
-func panicIfError(err error) {
+// exitIfError - Exit if an error occurred.
+func exitIfError(err error) {
 	if err != nil {
-		panic(err)
+		fmt.Printf("error: %v\n", err)
+		os.Exit(1)
 	}
 }
 
 // Execute - Executes the root command.
 func Execute() {
 	err := rootCmd.Execute()
-	panicIfError(err)
+	exitIfError(err)
 }

@@ -11,10 +11,13 @@ import (
 )
 
 var (
+	projectFlag string
+
 	gcpCmd = &cobra.Command{
-		Use:   "gcp",
+		Use:   "gcp [flags] secret_name",
 		Short: "Retrieves secrets from Google Cloud Platform Secret Manager",
-		Args:  cobra.NoArgs,
+		Long:  "Retrieves secrets from Google Cloud Platform Secret Manager",
+		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runGcp(args)
 		},
@@ -25,9 +28,38 @@ var (
 func init() {
 	// Add the list command to the root command.
 	rootCmd.AddCommand(gcpCmd)
+
+	// Command Flags
+	gcpCmd.Flags().StringVarP(&projectFlag, "project", "p", "", "GCP project containing the secret")
 }
 
-// runList() - runs the list command.
+// secret, ok := os.LookupEnv("SECRET")
+// if !ok {
+// 	log.Fatalf("Environment variable SECRET is required")
+// }
+// ctx := context.Background()
+// credentials, err := google.FindDefaultCredentials(ctx, compute.ComputeScope)
+// if err != nil {
+// 	fmt.Println(err)
+// 	os.Exit(1)
+// }
+// c, err := secretmanager.NewClient(ctx)
+// if err != nil {
+// 	fmt.Println(err)
+// 	os.Exit(2)
+// }
+// defer c.Close()
+
+// req := &secretmanagerpb.AccessSecretVersionRequest{
+// 	Name: fmt.Sprintf("projects/%s/secrets/%s/versions/latest", credentials.ProjectID, secret),
+// }
+// res, err := c.AccessSecretVersion(ctx, req)
+// if err != nil {
+// 	log.Fatalf("unable to access secret-version: %v", err)
+// }
+// fmt.Println(string(res.Payload.Data))
+
+// runGcp - runs the GCP command.
 func runGcp(args []string) {
-	fmt.Println("gcp not yet implemented")
+	exitIfError(fmt.Errorf("gcp not yet implemented (project:%s; args: %#v)", projectFlag, args))
 }

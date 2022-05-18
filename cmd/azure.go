@@ -14,9 +14,10 @@ var (
 	azureCmd = &cobra.Command{
 		Use:   "azure",
 		Short: "Retrieves secrets from Azure Key Vault",
+		Long:  "Retrieves secrets from Azure Key Vault",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runazure(args)
+			runAzure(args)
 		},
 	}
 )
@@ -27,7 +28,7 @@ func init() {
 	rootCmd.AddCommand(azureCmd)
 }
 
-// runList() - runs the list command.
-func runazure(args []string) {
-	fmt.Println("azure not yet implemented")
+// runAzure - runs the Azure command.
+func runAzure(args []string) {
+	exitIfError(fmt.Errorf("azure not yet implemented"))
 }

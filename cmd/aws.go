@@ -14,6 +14,7 @@ var (
 	awsCmd = &cobra.Command{
 		Use:   "aws",
 		Short: "Retrieves secrets from Amazon Web Services Secrets Manager",
+		Long:  "Retrieves secrets from Amazon Web Services Secrets Manager",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runAws(args)
@@ -27,7 +28,7 @@ func init() {
 	rootCmd.AddCommand(awsCmd)
 }
 
-// runList() - runs the list command.
+// runAws - runs the AWS command.
 func runAws(args []string) {
-	fmt.Println("aws not yet implemented")
+	exitIfError(fmt.Errorf("aws not yet implemented"))
 }
