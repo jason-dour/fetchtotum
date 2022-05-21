@@ -19,6 +19,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			runAzure(args)
 		},
+		DisableFlagsInUseLine: true,
 	}
 )
 

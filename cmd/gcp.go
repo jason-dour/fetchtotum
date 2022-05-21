@@ -14,13 +14,14 @@ var (
 	projectFlag string
 
 	gcpCmd = &cobra.Command{
-		Use:   "gcp [flags] secret_name",
+		Use:   "gcp [-p project] secret_name",
 		Short: "Retrieves secrets from Google Cloud Platform Secret Manager",
-		Long:  "Retrieves secrets from Google Cloud Platform Secret Manager",
+		Long:  `Retrieves secrets from Google Cloud Platform Secret Manager`,
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			runGcp(args)
 		},
+		DisableFlagsInUseLine: true,
 	}
 )
 
@@ -30,9 +31,12 @@ func init() {
 	rootCmd.AddCommand(gcpCmd)
 
 	// Command Flags
-	gcpCmd.Flags().StringVarP(&projectFlag, "project", "p", "", "GCP project containing the secret")
+	gcpCmd.Flags().StringVarP(&projectFlag, "project", "p", "", "GCP project for the secret; detect if not provided")
 }
 
+//
+// Some quick hackery found on GH for consideration.
+//
 // secret, ok := os.LookupEnv("SECRET")
 // if !ok {
 // 	log.Fatalf("Environment variable SECRET is required")

@@ -28,13 +28,14 @@ var (
 		CompletionOptions: cobra.CompletionOptions{
 			HiddenDefaultCmd: true,
 		},
+		DisableFlagsInUseLine: true,
 	}
 )
 
 // exitIfError - Exit if an error occurred.
 func exitIfError(err error) {
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
+		fmt.Printf("error: %s\n", err.Error())
 		os.Exit(1)
 	}
 }
