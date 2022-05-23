@@ -5,14 +5,24 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/compute/v1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 var (
+	// projectFlag - GCP project for the secret; detect if not provided.
 	projectFlag string
 
+	// versionFlag - the version of the secret to retrieve.
+	versionFlag string
+
+	// gcpCmd - Cobra definition for GCP command.
 	gcpCmd = &cobra.Command{
 		Use:   "gcp [-p project] secret_name",
 		Short: "Retrieves secrets from Google Cloud Platform Secret Manager",
@@ -32,38 +42,54 @@ func init() {
 
 	// Command Flags
 	gcpCmd.Flags().StringVarP(&projectFlag, "project", "p", "", "GCP project for the secret; detect if not provided")
+	gcpCmd.Flags().StringVarP(&versionFlag, "version", "v", "latest", "version for the secret; default: latest")
 }
 
-//
-// Some quick hackery found on GH for consideration.
-//
-// secret, ok := os.LookupEnv("SECRET")
-// if !ok {
-// 	log.Fatalf("Environment variable SECRET is required")
-// }
-// ctx := context.Background()
-// credentials, err := google.FindDefaultCredentials(ctx, compute.ComputeScope)
-// if err != nil {
-// 	fmt.Println(err)
-// 	os.Exit(1)
-// }
-// c, err := secretmanager.NewClient(ctx)
-// if err != nil {
-// 	fmt.Println(err)
-// 	os.Exit(2)
-// }
-// defer c.Close()
-
-// req := &secretmanagerpb.AccessSecretVersionRequest{
-// 	Name: fmt.Sprintf("projects/%s/secrets/%s/versions/latest", credentials.ProjectID, secret),
-// }
-// res, err := c.AccessSecretVersion(ctx, req)
-// if err != nil {
-// 	log.Fatalf("unable to access secret-version: %v", err)
-// }
-// fmt.Println(string(res.Payload.Data))
+// versionSelected - Returns the version requested.
+func versionSelected() string {
+	debug("versionSelected(): begin")
+	version := ""
+	if len(versionFlag) == 0 {
+		version = "latest"
+		debug("versionSelected(): versionFlag is empty; using default: %s", version)
+	} else {
+		version = versionFlag
+		debug("versionSelected(): versionFlag is not empty; using: %s", version)
+	}
+	debug("versionSelected(): end: version=%s", version)
+	return version
+}
 
 // runGcp - runs the GCP command.
 func runGcp(args []string) {
-	exitIfError(fmt.Errorf("gcp not yet implemented (project:%s; args: %#v)", projectFlag, args))
+	debug("runGcp(): begin: []args=%s", args)
+
+	ctx := context.Background()
+
+	debug("runGcp(): looking up credentials")
+	credentials, err := google.FindDefaultCredentials(ctx, compute.ComputeScope)
+	exitIfError(err)
+	debug("runGcp(): credentials: %+v", credentials)
+
+	debug("runGcp(): creating client")
+	client, err := secretmanager.NewClient(ctx)
+	exitIfError(err)
+	defer client.Close()
+	debug("runGcp(): client: %+v", client)
+
+	debug("runGcp(): creating request")
+	request := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", credentials.ProjectID, args[0], versionSelected()),
+	}
+	debug("runGcp(): request: %#v", request)
+
+	debug("runGcp(): issuing request")
+	response, err := client.AccessSecretVersion(ctx, request)
+	exitIfError(err)
+	debug("runGcp(): response: %#v", response)
+
+	debug("runGcp(): output secret.")
+	fmt.Printf("%s\n", response.Payload.Data)
+
+	debug("runGcp(): end")
 }
