@@ -94,6 +94,10 @@ func runGcp(args []string) {
 	exitIfError(err)
 	debug("runGcp(): project: %s", project)
 
+	debug("runGcp(): select version")
+	version := versionSelected()
+	debug("runGcp(): version: %s", version)
+
 	debug("runGcp(): creating client")
 	client, err := secretmanager.NewClient(ctx)
 	exitIfError(err)
@@ -102,7 +106,7 @@ func runGcp(args []string) {
 
 	debug("runGcp(): creating request")
 	request := &secretmanagerpb.AccessSecretVersionRequest{
-		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", project, args[0], versionSelected()),
+		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", project, args[0], version),
 	}
 	debug("runGcp(): request: %#v", request)
 
