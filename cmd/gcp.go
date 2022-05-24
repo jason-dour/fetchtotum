@@ -60,6 +60,23 @@ func versionSelected() string {
 	return version
 }
 
+// determineProject - Returns the project name.
+func determineProject(credentials *google.Credentials) (string, error) {
+	debug("determineProject(): begin")
+	project := ""
+	// Project flag overrides the project in the credentials.
+	if len(projectFlag) != 0 {
+		debug("determineProject(): projectFlag is set; using projectFlag: %s", projectFlag)
+		return credentials.ProjectID, nil
+	} else if len(credentials.ProjectID) != 0 {
+		debug("determineProject(): projectFlag is not set; project from credentials: %s", project)
+		return credentials.ProjectID, nil
+	} else {
+		debug("determineProject(): projectFlag is not set; credentials do not provide project")
+		return "", fmt.Errorf("project not specified by flag or credentials")
+	}
+}
+
 // runGcp - runs the GCP command.
 func runGcp(args []string) {
 	debug("runGcp(): begin: []args=%s", args)
@@ -71,6 +88,11 @@ func runGcp(args []string) {
 	exitIfError(err)
 	debug("runGcp(): credentials: %+v", credentials)
 
+	debug("runGcp(): determine project")
+	project, err := determineProject(credentials)
+	exitIfError(err)
+	debug("runGcp(): project: %s", project)
+
 	debug("runGcp(): creating client")
 	client, err := secretmanager.NewClient(ctx)
 	exitIfError(err)
@@ -79,7 +101,7 @@ func runGcp(args []string) {
 
 	debug("runGcp(): creating request")
 	request := &secretmanagerpb.AccessSecretVersionRequest{
-		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", credentials.ProjectID, args[0], versionSelected()),
+		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s", project, args[0], versionSelected()),
 	}
 	debug("runGcp(): request: %#v", request)
 
