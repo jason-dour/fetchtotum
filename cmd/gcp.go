@@ -63,7 +63,6 @@ func versionSelected() string {
 // determineProject - Returns the project name.
 func determineProject(credentials *google.Credentials) (string, error) {
 	debug("determineProject(): begin")
-	project := ""
 	// Project flag overrides the project in the credentials.
 	if len(projectFlag) != 0 {
 		debug("determineProject(): projectFlag is set; using projectFlag: %s", projectFlag)
