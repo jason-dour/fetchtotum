@@ -67,9 +67,11 @@ func determineProject(credentials *google.Credentials) (string, error) {
 	// Project flag overrides the project in the credentials.
 	if len(projectFlag) != 0 {
 		debug("determineProject(): projectFlag is set; using projectFlag: %s", projectFlag)
+		debug("determineProject(): end: project=%s", projectFlag)
 		return credentials.ProjectID, nil
 	} else if len(credentials.ProjectID) != 0 {
-		debug("determineProject(): projectFlag is not set; project from credentials: %s", project)
+		debug("determineProject(): projectFlag is not set; project from credentials: %s", credentials.ProjectID)
+		debug("determineProject(): end: project=%s", credentials.ProjectID)
 		return credentials.ProjectID, nil
 	} else {
 		debug("determineProject(): projectFlag is not set; credentials do not provide project")
