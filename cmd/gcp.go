@@ -67,7 +67,7 @@ func determineProject(credentials *google.Credentials) (string, error) {
 	if len(projectFlag) != 0 {
 		debug("determineProject(): projectFlag is set; using projectFlag: %s", projectFlag)
 		debug("determineProject(): end: project=%s", projectFlag)
-		return credentials.ProjectID, nil
+		return projectFlag, nil
 	} else if len(credentials.ProjectID) != 0 {
 		debug("determineProject(): projectFlag is not set; project from credentials: %s", credentials.ProjectID)
 		debug("determineProject(): end: project=%s", credentials.ProjectID)
